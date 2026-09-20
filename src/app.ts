@@ -1,14 +1,14 @@
-import './components/ScrapeForm';
-import './components/ErrorMessage';
-import './components/SuccessMessage';
-import './components/LoadingBar';
-import './components/DownloadForm';
+import { ScrapeForm } from './components/ScrapeForm';
+import { ErrorMessage } from './components/ErrorMessage';
+import { SuccessMessage } from './components/SuccessMessage';
+import { LoadingBar } from './components/LoadingBar';
+import { DownloadForm } from './components/DownloadForm';
 
 const app = document.getElementById('app') as HTMLElement;
-const scrapeForm = document.createElement('scrape-form') as ScapeForm;
+const scrapeForm = document.createElement('scrape-form') as ScrapeForm;
 const errorMessage = document.createElement('error-message') as ErrorMessage;
 const successMessage = document.createElement('success-message') as SuccessMessage;
-const loadingBar = document.createElement('loading-bar');
+const loadingBar = document.createElement('loading-bar') as LoadingBar;
 const downloadForm = document.createElement('download-form') as DownloadForm;
 
 interface ScrapeResponse {

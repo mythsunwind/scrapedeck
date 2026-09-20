@@ -16,11 +16,19 @@ app = Flask(__name__)
 
 @app.route("/")
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('dist', 'index.html')
 
-@app.route('/js/<path:filename>')
+@app.route('/assets/<path:filename>')
 def serve_js(filename):
-    return send_from_directory('dist', filename)
+    filepath = os.path.join('dist', 'assets', filename)
+    if not os.path.exists(filepath) or not filename.endswith('.js'):
+        return "File not found", 404
+
+    with open(filepath, 'rb') as f:
+        content = f.read()
+
+    response = Response(content, mimetype='application/javascript')
+    return response
 
 @app.route("/api/scrape")
 def scrape():

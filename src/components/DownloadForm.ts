@@ -1,4 +1,4 @@
-import './YearButton';
+import { YearButton } from './YearButton';
 
 export class DownloadForm extends HTMLElement {
   private _url = "";
@@ -152,7 +152,7 @@ export class DownloadForm extends HTMLElement {
     }
     years.map( (year) => {
       const button = document.createElement('year-button') as YearButton;
-      button.year = year;
+      button.year = String(year);
       if (this.defaultYear === year) {
         button.checked = true;
       }
