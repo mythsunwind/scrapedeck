@@ -1,15 +1,29 @@
 import './YearButton';
 
 export class DownloadForm extends HTMLElement {
-  private _original = "Test";
+  private _url = "";
+  private _original = "";
   private _artist = "";
   private _title = "";
   private _defaultYear = 2026;
   private _uploadDate = "";
-  private _onClick?: () => void;
+  private _onCancel?: () => void;
+  private _onSubmit?: (url: string, artist: string, title: string, year: number) => void;
 
   constructor() {
     super();
+  }
+
+  get url(): string {
+    return this._url;
+  }
+
+  set url(value: string) {
+    this._url = value;
+
+    if (this.isConnected) {
+      this.render();
+    }
   }
 
   get original(): string {
@@ -18,6 +32,10 @@ export class DownloadForm extends HTMLElement {
 
   set original(value: string) {
     this._original = value;
+
+    if (this.isConnected) {
+      this.render();
+    }
   }
 
   get artist(): string {
@@ -26,6 +44,10 @@ export class DownloadForm extends HTMLElement {
 
   set artist(value: string) {
     this._artist = value;
+
+    if (this.isConnected) {
+      this.render();
+    }
   }
 
   get title(): string {
@@ -34,6 +56,10 @@ export class DownloadForm extends HTMLElement {
 
   set title(value: string) {
     this._title = value;
+
+    if (this.isConnected) {
+      this.render();
+    }
   }
 
   get uploadDate(): string {
@@ -42,6 +68,10 @@ export class DownloadForm extends HTMLElement {
 
   set uploadDate(value: string) {
     this._uploadDate = value;
+
+    if (this.isConnected) {
+      this.render();
+    }
   }
 
   get defaultYear(): number {
@@ -52,12 +82,20 @@ export class DownloadForm extends HTMLElement {
     this._defaultYear = value;
   }
 
-  get onClick(): (() => void) | undefined {
-    return this._onClick;
+  get onCancel(): (() => void) | undefined {
+    return this._onCancel;
   }
 
-  set onClick(callback: (() => void) | undefined) {
-    this._onClick = callback;
+  set onCancel(callback: (() => void) | undefined) {
+    this._onCancel = callback;
+  }
+
+  get onSubmit(): ((url: string, artist: string, title: string, year: number) => void) | undefined {
+    return this._onSubmit;
+  }
+
+  set onSubmit(callback: ((url: string, artist: string, title: string, year: number) => void) | undefined) {
+    this._onSubmit = callback;
   }
 
   connectedCallback() {
@@ -66,9 +104,11 @@ export class DownloadForm extends HTMLElement {
 
   private render(): void {
     this.innerHTML = `
+    <form class="row g-3 needs-validation" novalidate>
       <div class="row mb-3">
         <div class="col-12 col-form-label">
           Original video title: ${this.original}
+          <input type="hidden" id="url" class="form-control" value="${this.url}" />
         </div>
       </div>
       <div class="row mb-3">
@@ -98,11 +138,11 @@ export class DownloadForm extends HTMLElement {
         </div>
       </fieldset>
       <button type="submit" class="btn btn-primary">Download</button>
+      <button id="cancel" class="btn btn-danger">Cancel</button>
+    </form>
     `;
-    const button = this.querySelector("button");
-    button?.addEventListener("click", () => {
-      this._onClick?.();
-    });
+    const cancelButton = document.getElementById("cancel");
+    cancelButton?.addEventListener("click", () => this.onCancel!());
     const yearsContainer = document.getElementById("years");
     const currentYear = new Date().getFullYear();
     const lastYear = currentYear - 1;
@@ -118,7 +158,22 @@ export class DownloadForm extends HTMLElement {
       }
       yearsContainer?.appendChild(button);
     });
-    
+
+    const inputUrl = document.getElementById('url') as HTMLInputElement;
+    const inputArtist = document.getElementById('artist') as HTMLInputElement;
+    const inputTitle = document.getElementById('title') as HTMLInputElement;
+    //const inputYear = document.getElementById('year') as HTMLInputElement;
+    const form = document.querySelector('.needs-validation') as HTMLFormElement;
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+      } else {
+        this._onSubmit?.(inputUrl.value, inputArtist.value, inputTitle.value, 2026);
+      }
+
+      form.classList.add('was-validated')
+    }, false)
   }
 }
 

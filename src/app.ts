@@ -16,13 +16,13 @@ interface ScrapeResponse {
 
 async function scrape(url: string): Promise<ScrapeResponse> {
   try {
-    const response = await fetch(`/api/scrape?url=${url}`); // Example API endpoint
+    const response = await fetch(`/api/scrape?url=${url}`);
 
     if (!response.ok) {
       throw new Error(`${await response.text()}`);
     }
 
-    const data: ScrapeResponse = await response.json(); // Parse JSON into a TypeScript object
+    const data: ScrapeResponse = await response.json();
     return data;
   } catch (error) {
     console.error('Error fetching or parsing JSON:', error);
@@ -35,7 +35,7 @@ async function download(url: string, artist: string, title: string, year: string
     const response = await fetch(`/api/download`, { method: "POST" });
 
     if (!response.ok) {
-      throw new Error(`${response.text}`);
+      throw new Error(`${await response.text()}`);
     }
 
     const data = await response.text();
@@ -46,7 +46,7 @@ async function download(url: string, artist: string, title: string, year: string
   }
 }
 
-function sanatizeTitle(original: string): string {
+function sanitizeTitle(original: string): string {
     original = original.replace("(Official)", "")
     original = original.replace("(Official Video)", "")
     original = original.replace("(Official Music Video)", "")
@@ -54,11 +54,11 @@ function sanatizeTitle(original: string): string {
 }
 
 function getArtist(original: string): string {
-    return (original.indexOf('-') > 0) ? original.split('-')[0] : original;
+    return (original.indexOf('-') > 0) ? original.split('-')[0].trim() : original;
 }
 
 function getTitle(original: string): string {
-    return (original.indexOf('-') > 0) ? original.split('-')[1] : original;
+    return (original.indexOf('-') > 0) ? original.split('-')[1].trim() : original;
 }
 
 function getDefaultYear(original: string): string {
@@ -75,13 +75,28 @@ document.addEventListener('DOMContentLoaded', () => {
             app.appendChild(downloadForm);
             downloadForm.original = data.title;
             downloadForm.uploadDate = data.upload_date;
-            const original = sanatizeTitle(data.title);
+            const original = sanitizeTitle(data.title);
             downloadForm.artist = getArtist(original);
             downloadForm.title = getTitle(original);
             downloadForm.defaultYear = Number(getDefaultYear(data.upload_date));
-            downloadForm.onClick = () => {
-                download(value, downloadForm.artist, downloadForm.title, downloadForm.year);
-            }
+            downloadForm.onCancel = () => {
+                app.removeChild(downloadForm);
+                app.appendChild(scrapeForm);
+            };
+            downloadForm.onSubmit = (url: string, artist: string, title: string, year: number) => {
+                app.removeChild(downloadForm);
+                app.appendChild(loadingBar);
+                download(url, artist, title, String(year))
+                    .then(() => {
+
+                    })
+                    .catch((error) => {
+                        app.removeChild(loadingBar);
+                        app.appendChild(errorMessage);
+                        errorMessage.label = error.message;
+                        app.appendChild(downloadForm);
+                    });
+            };
         })
         .catch((error) => {
             app.removeChild(loadingBar);
