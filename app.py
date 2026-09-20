@@ -74,7 +74,7 @@ def download():
 
         update_metadata(filename, artist, title, year)
 
-        move_to_output_directory(filename)
+        move_to_output_directory(filename, year)
     except Exception as e:
         return Response("Exception: " + str(e), mimetype="text/plain", status=500)
     return Response(f"Successfully added song '{artist} - {title}' to playlist {year}!\n", mimetype="text/plain", status=200)
@@ -88,5 +88,6 @@ def update_metadata(filename: str, artist: str, title: str, year: str):
         audiofile.tag.album_artist = "Various Artists"
         audiofile.tag.save() # type: ignore
 
-def move_to_output_directory(filename: str):
-    os.replace(os.getcwd() + f'/{filename}.mp3', output_dir + f'/{filename}.mp3')
+def move_to_output_directory(filename: str, year: str):
+    os.makedirs(output_dir + f'/{year}', exist_ok=True)
+    os.replace(os.getcwd() + f'/{filename}.mp3', output_dir + f'/{year}/{filename}.mp3')
