@@ -1,29 +1,16 @@
 export class ScrapeForm extends HTMLElement {
-  private _label = "";
-  private _onClick?: () => void;
+  private _onSubmit?: (value: string) => void;
 
   constructor() {
     super();
   }
 
-  get label(): string {
-    return this._label;
+  get onSubmit(): ((value: string) => void) | undefined {
+    return this._onSubmit;
   }
 
-  set label(value: string) {
-    this._label = value;
-
-    if (this.isConnected) {
-      this.render();
-    }
-  }
-
-  get onClick(): (() => void) | undefined {
-    return this._onClick;
-  }
-
-  set onClick(callback: (() => void) | undefined) {
-    this._onClick = callback;
+  set onSubmit(callback: ((value: string) => void) | undefined) {
+    this._onSubmit = callback;
   }
 
   connectedCallback() {
@@ -32,23 +19,39 @@ export class ScrapeForm extends HTMLElement {
 
   private render(): void {
     this.innerHTML = `
-      <div class="row g-3 align-items-center">
-        <div class="col-auto">
-          <label for="inputURL" class="col-form-label">${this.label}</label>
+      <form class="row g-3 needs-validation" novalidate>
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <label for="inputURL" class="col-form-label">URL</label>
+          </div>
+          <div class="col-auto">
+            <input type="text" id="inputURL" value="" class="form-control" pattern="https?://.*" required>
+            <div class="invalid-feedback">
+              This is no valid URL.
+            </div>
+          </div>
+          <div class="col-auto">
+            <button class="btn btn-primary" type="submit">Scrape</button>
+          </div>
         </div>
-        <div class="col-auto">
-          <input type="text" id="inputURL" class="form-control">
-        </div>
-        <div class="col-auto">
-          <button class="btn btn-primary">Scrape</button>
-        </div>
-      </div>
+        
+      </form>
     `;
-    const button = this.querySelector("button");
-    button?.addEventListener("click", () => {
-      this._onClick?.();
-    });
+
+    const input = document.querySelector('input') as HTMLInputElement;
+    const form = document.querySelector('.needs-validation') as HTMLFormElement;
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+          event.preventDefault()
+          event.stopPropagation()
+      } else {
+        this._onSubmit?.(input.value);
+      }
+
+      form.classList.add('was-validated')
+    }, false)
   }
+
 }
 
 customElements.define('scrape-form', ScrapeForm);

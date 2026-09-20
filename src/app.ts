@@ -26,7 +26,7 @@ async function scrape(url: string): Promise<ScrapeResponse> {
     return data;
   } catch (error) {
     console.error('Error fetching or parsing JSON:', error);
-    throw error; // Re-throw the error if you want calling code to handle it
+    throw error;
   }
 }
 
@@ -46,20 +46,41 @@ async function download(url: string, artist: string, title: string, year: string
   }
 }
 
+function sanatizeTitle(original: string): string {
+    original = original.replace("(Official)", "")
+    original = original.replace("(Official Video)", "")
+    original = original.replace("(Official Music Video)", "")
+    return original.trim().replace(/[^a-zA-Z ,-]/g, '');
+}
+
+function getArtist(original: string): string {
+    return (original.indexOf('-') > 0) ? original.split('-')[0] : original;
+}
+
+function getTitle(original: string): string {
+    return (original.indexOf('-') > 0) ? original.split('-')[1] : original;
+}
+
+function getDefaultYear(original: string): string {
+    return original.length > 4 ? original.substring(0, 4) : String(new Date().getFullYear());
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-  scrapeForm.label = 'URL';
-  scrapeForm.onClick = () => {
+  scrapeForm.onSubmit = (value: string) => {
     app.removeChild(scrapeForm);
     app.appendChild(loadingBar);
-    scrape(scrapeForm.url)
+    scrape(value)
         .then((data) => {
             app.removeChild(loadingBar);
             app.appendChild(downloadForm);
             downloadForm.original = data.title;
             downloadForm.uploadDate = data.upload_date;
+            const original = sanatizeTitle(data.title);
+            downloadForm.artist = getArtist(original);
+            downloadForm.title = getTitle(original);
+            downloadForm.defaultYear = getDefaultYear(data.upload_date);
             downloadForm.onClick = () => {
-                download(scrapeForm.url, downloadForm.artist, downloadForm.title, downloadForm.year)
+                download(value, downloadForm.artist, downloadForm.title, downloadForm.year);
             }
         })
         .catch((error) => {

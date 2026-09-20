@@ -1,7 +1,10 @@
+import './YearButton';
+
 export class DownloadForm extends HTMLElement {
   private _original = "Test";
   private _artist = "";
   private _title = "";
+  private _defaultYear = "";
   private _uploadDate = "";
   private _onClick?: () => void;
 
@@ -57,6 +60,18 @@ export class DownloadForm extends HTMLElement {
     }
   }
 
+  get defaultYear(): string {
+    return this._defaultYear;
+  }
+
+  set defaultYear(value: string) {
+    this._defaultYear = value;
+
+    if (this.isConnected) {
+      this.render();
+    }
+  }
+
   get onClick(): (() => void) | undefined {
     return this._onClick;
   }
@@ -99,12 +114,7 @@ export class DownloadForm extends HTMLElement {
       </div>
       <fieldset class="row mb-3">
         <legend class="col-form-label col-2 pt-0">Playlist</legend>
-        <div class="col-auto">
-            <input type="radio" class="btn-check" name="year" id="2025" autocomplete="off" checked>
-            <label class="btn btn-secondary" for="2025">2025</label>
-
-            <input type="radio" class="btn-check" name="year" id="2026" autocomplete="off">
-            <label class="btn btn-secondary" for="2026">2026</label>
+        <div class="col-auto" id="years">
         </div>
       </fieldset>
       <button type="submit" class="btn btn-primary">Download</button>
@@ -113,6 +123,14 @@ export class DownloadForm extends HTMLElement {
     button?.addEventListener("click", () => {
       this._onClick?.();
     });
+    const yearsContainer = document.getElementById("years");
+    const yearButton = document.createElement('year-button') as YearButton;
+    const currentYear = String(new Date().getFullYear());
+    if (currentYear === this.defaultYear) {
+      yearButton.year = this.defaultYear;
+      yearButton.checked = true;
+    }
+    yearsContainer?.appendChild(yearButton);
   }
 }
 
