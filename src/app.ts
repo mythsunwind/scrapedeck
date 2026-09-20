@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const original = sanatizeTitle(data.title);
             downloadForm.artist = getArtist(original);
             downloadForm.title = getTitle(original);
-            downloadForm.defaultYear = getDefaultYear(data.upload_date);
+            downloadForm.defaultYear = Number(getDefaultYear(data.upload_date));
             downloadForm.onClick = () => {
                 download(value, downloadForm.artist, downloadForm.title, downloadForm.year);
             }

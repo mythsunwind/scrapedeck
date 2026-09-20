@@ -29,7 +29,7 @@ export class YearButton extends HTMLElement {
   private render(): void {
     this.innerHTML = `
       <input type="radio" class="btn-check" name="year" id="${this.year}" autocomplete="off" checked="${this.checked}">
-      <label class="btn" for="${this.year}">${this.year}</label>
+      <label class="btn btn-outline-primary" for="${this.year}">${this.year}</label>
     `;
   }
 }

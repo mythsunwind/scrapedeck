@@ -4,7 +4,7 @@ export class DownloadForm extends HTMLElement {
   private _original = "Test";
   private _artist = "";
   private _title = "";
-  private _defaultYear = "";
+  private _defaultYear = 2026;
   private _uploadDate = "";
   private _onClick?: () => void;
 
@@ -18,10 +18,6 @@ export class DownloadForm extends HTMLElement {
 
   set original(value: string) {
     this._original = value;
-
-    if (this.isConnected) {
-      this.render();
-    }
   }
 
   get artist(): string {
@@ -30,10 +26,6 @@ export class DownloadForm extends HTMLElement {
 
   set artist(value: string) {
     this._artist = value;
-
-    if (this.isConnected) {
-      this.render();
-    }
   }
 
   get title(): string {
@@ -42,10 +34,6 @@ export class DownloadForm extends HTMLElement {
 
   set title(value: string) {
     this._title = value;
-
-    if (this.isConnected) {
-      this.render();
-    }
   }
 
   get uploadDate(): string {
@@ -54,22 +42,14 @@ export class DownloadForm extends HTMLElement {
 
   set uploadDate(value: string) {
     this._uploadDate = value;
-
-    if (this.isConnected) {
-      this.render();
-    }
   }
 
-  get defaultYear(): string {
+  get defaultYear(): number {
     return this._defaultYear;
   }
 
-  set defaultYear(value: string) {
+  set defaultYear(value: number) {
     this._defaultYear = value;
-
-    if (this.isConnected) {
-      this.render();
-    }
   }
 
   get onClick(): (() => void) | undefined {
@@ -124,13 +104,21 @@ export class DownloadForm extends HTMLElement {
       this._onClick?.();
     });
     const yearsContainer = document.getElementById("years");
-    const yearButton = document.createElement('year-button') as YearButton;
-    const currentYear = String(new Date().getFullYear());
-    if (currentYear === this.defaultYear) {
-      yearButton.year = this.defaultYear;
-      yearButton.checked = true;
+    const currentYear = new Date().getFullYear();
+    const lastYear = currentYear - 1;
+    const years = [lastYear, currentYear];
+    if (!years.includes(this.defaultYear)) {
+      years.push(this.defaultYear);
     }
-    yearsContainer?.appendChild(yearButton);
+    years.map( (year) => {
+      const button = document.createElement('year-button') as YearButton;
+      button.year = year;
+      if (this.defaultYear === year) {
+        button.checked = true;
+      }
+      yearsContainer?.appendChild(button);
+    });
+    
   }
 }
 
