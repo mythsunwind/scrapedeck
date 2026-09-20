@@ -23,6 +23,10 @@ Run frontend
 
     npm run dev
 
+For test run it is best to adjust the output directory by create a **.env** file with the following content:
+
+    OUTPUT_DIRECTORY="/path/to/output/"
+
 ## Test
 
 Test scraping:

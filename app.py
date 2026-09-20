@@ -5,6 +5,13 @@ import eyed3
 import re
 import json
 
+from dotenv import load_dotenv
+import os
+
+# Load environment variables from .env file
+load_dotenv()
+output_dir = os.getenv("OUTPUT_DIRECTORY", "/output")
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -66,6 +73,8 @@ def download():
             ydl.download([url])
 
         update_metadata(filename, artist, title, year)
+
+        move_to_output_directory(filename)
     except Exception as e:
         return Response("Exception: " + str(e), mimetype="text/plain", status=500)
     return Response(f"Successfully added song '{artist} - {title}' to playlist {year}!\n", mimetype="text/plain", status=200)
@@ -79,3 +88,5 @@ def update_metadata(filename: str, artist: str, title: str, year: str):
         audiofile.tag.album_artist = "Various Artists"
         audiofile.tag.save() # type: ignore
 
+def move_to_output_directory(filename: str):
+    os.replace(os.getcwd() + f'/{filename}.mp3', output_dir + f'/{filename}.mp3')
