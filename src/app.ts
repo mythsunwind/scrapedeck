@@ -1,11 +1,13 @@
 import './components/ScrapeForm';
-import './components/Error';
+import './components/ErrorMessage';
+import './components/SuccessMessage';
 import './components/LoadingBar';
 import './components/DownloadForm';
 
 const app = document.getElementById('app') as HTMLElement;
 const scrapeForm = document.createElement('scrape-form') as ScapeForm;
 const errorMessage = document.createElement('error-message') as ErrorMessage;
+const successMessage = document.createElement('success-message') as SuccessMessage;
 const loadingBar = document.createElement('loading-bar');
 const downloadForm = document.createElement('download-form') as DownloadForm;
 
@@ -32,14 +34,22 @@ async function scrape(url: string): Promise<ScrapeResponse> {
 
 async function download(url: string, artist: string, title: string, year: string): Promise<string> {
   try {
-    const response = await fetch(`/api/download`, { method: "POST" });
+    const response = await fetch(`/api/download`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            url: url,
+            artist: artist,
+            title: title,
+            year: year,
+        })
+    });
 
     if (!response.ok) {
       throw new Error(`${await response.text()}`);
     }
 
-    const data = await response.text();
-    return data;
+    return await response.text();
   } catch (error) {
     console.error('Error fetching or parsing JSON:', error);
     throw error;
@@ -67,12 +77,18 @@ function getDefaultYear(original: string): string {
 
 document.addEventListener('DOMContentLoaded', () => {
   scrapeForm.onSubmit = (value: string) => {
+    try {
+        app.removeChild(successMessage);
+    } catch(error) {
+        // noop
+    }
     app.removeChild(scrapeForm);
     app.appendChild(loadingBar);
     scrape(value)
         .then((data) => {
             app.removeChild(loadingBar);
             app.appendChild(downloadForm);
+            downloadForm.url = value;
             downloadForm.original = data.title;
             downloadForm.uploadDate = data.upload_date;
             const original = sanitizeTitle(data.title);
@@ -87,8 +103,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 app.removeChild(downloadForm);
                 app.appendChild(loadingBar);
                 download(url, artist, title, String(year))
-                    .then(() => {
-
+                    .then((message) => {
+                        app.removeChild(loadingBar);
+                        app.appendChild(successMessage);
+                        successMessage.label = message;
+                        app.appendChild(scrapeForm);
                     })
                     .catch((error) => {
                         app.removeChild(loadingBar);

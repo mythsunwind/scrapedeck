@@ -3,6 +3,7 @@ from yt_dlp import YoutubeDL
 
 import eyed3
 import re
+import json
 
 app = Flask(__name__)
 
@@ -38,10 +39,11 @@ def scrape():
 
 @app.route("/api/download", methods=['POST'])
 def download():
-    url = request.form.get('url')
-    artist = request.form.get('artist')
-    title = request.form.get('title')
-    year = request.form.get('year')
+    data = json.loads(request.data)
+    url = data.get('url')
+    artist = data.get('artist')
+    title = data.get('title')
+    year = data.get('year')
     filename = f'{artist} - {title}'
     ydl_opts = {
         'format': 'bestaudio/best',
@@ -51,8 +53,6 @@ def download():
             'preferredcodec': 'mp3'
         }],
     }
-    print("bla")
-    print(artist)
     if not url:
         return Response("URL is missing\n", mimetype="text/plain", status=400)
     if not artist:
@@ -68,7 +68,7 @@ def download():
         update_metadata(filename, artist, title, year)
     except Exception as e:
         return Response("Exception: " + str(e), mimetype="text/plain", status=500)
-    return Response(status=200)
+    return Response(f"Successfully added song '{artist} - {title}' to playlist {year}!\n", mimetype="text/plain", status=200)
 
 def update_metadata(filename: str, artist: str, title: str, year: str):
     audiofile = eyed3.load(f'{filename}.mp3')
