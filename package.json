@@ -1,0 +1,19 @@
+{
+  "name": "scrapedeck",
+  "version": "1.0.0",
+  "description": "Download music from youtube and others to add them to your annual playlist",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "Sven Jost",
+  "license": "GPL-3.0-only",
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.0"
+  }
+}
