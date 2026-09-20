@@ -82,6 +82,11 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(error) {
         // noop
     }
+    try {
+        app.removeChild(errorMessage);
+    } catch(error) {
+        // noop
+    }
     app.removeChild(scrapeForm);
     app.appendChild(loadingBar);
     scrape(value)
