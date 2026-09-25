@@ -1,3 +1,8 @@
+# Scrapedeck
+
+Scrape songs and add them to a named directory to create a yearly playlist
+that can be easily added to Jellyfin or other servers.
+
 ## Install
 
     pipenv shell
