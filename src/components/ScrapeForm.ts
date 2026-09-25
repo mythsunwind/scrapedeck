@@ -19,22 +19,17 @@ export class ScrapeForm extends HTMLElement {
 
   private render(): void {
     this.innerHTML = `
-      <form class="row g-3 needs-validation" novalidate>
-        <div class="row g-3 align-items-center">
-          <div class="col-auto">
-            <label for="inputURL" class="col-form-label">URL</label>
-          </div>
-          <div class="col-auto">
-            <input type="text" id="inputURL" value="" class="form-control" pattern="https?://.*" required>
-            <div class="invalid-feedback">
-              This is no valid URL.
-            </div>
-          </div>
-          <div class="col-auto">
-            <button class="btn btn-primary" type="submit">Scrape</button>
+      <form class="needs-validation" novalidate>
+        <div class="mb-3">
+          <label for="inputURL" class="col-form-label">Enter URL from Youtube:</label>
+          <input type="text" id="inputURL" value="" class="form-control" pattern="https?://.*" placeholder="Example: https://www.youtube.com/watch?v=..." required>
+          <div class="invalid-feedback">
+            This is no valid URL.
           </div>
         </div>
-        
+        <div class="d-grid">
+          <button class="btn btn-primary" type="submit">Scrape</button>
+        </div>
       </form>
     `;
 
