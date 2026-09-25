@@ -12,6 +12,16 @@
 
     flask run
 
+## Docker
+
+### Build docker image
+
+    docker build -t scrapedeck .
+
+### Run docker image
+
+    docker run -v ./output:/output -p 5000:5000 scrapedeck
+
 ## Development
 
 Run backend in debug:

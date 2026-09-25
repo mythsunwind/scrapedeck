@@ -4,9 +4,10 @@ from yt_dlp import YoutubeDL
 import eyed3
 import re
 import json
+import os
+import shutil
 
 from dotenv import load_dotenv
-import os
 
 # Load environment variables from .env file
 load_dotenv()
@@ -98,4 +99,4 @@ def update_metadata(filename: str, artist: str, title: str, year: str):
 
 def move_to_output_directory(filename: str, year: str):
     os.makedirs(output_dir + f'/{year}', exist_ok=True)
-    os.replace(os.getcwd() + f'/{filename}.mp3', output_dir + f'/{year}/{filename}.mp3')
+    shutil.move(os.getcwd() + f'/{filename}.mp3', output_dir + f'/{year}/{filename}.mp3')
