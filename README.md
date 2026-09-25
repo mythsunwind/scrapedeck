@@ -3,27 +3,28 @@
 Scrape songs and add them to a named directory to create a yearly playlist
 that can be easily added to Jellyfin or other servers.
 
-## Install
+## Build frontend
 
     pipenv shell
     pipenv install
     npm install
-
-## Build frontend
-
     npm run build
 
-## Run
+### Run
 
     flask run
 
-## Docker
+## Alternative: Docker
 
-### Build docker image
+Build manually:
 
     docker build -t scrapedeck .
 
-### Run docker image
+or get from repository:
+
+    docker pull ghcr.io/mythsunwind/scrapedeck:1.0
+
+### Run
 
     docker run -v ./output:/output -p 5000:5000 scrapedeck
 
@@ -42,7 +43,7 @@ For test run it is best to adjust the output directory by create a **.env** file
 
     OUTPUT_DIRECTORY="/path/to/output/"
 
-## Test
+## Testing
 
 Test scraping:
 
