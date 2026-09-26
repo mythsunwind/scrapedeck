@@ -6,10 +6,10 @@ import { DownloadForm } from './components/DownloadForm';
 
 const app = document.getElementById('app') as HTMLElement;
 const scrapeForm = document.createElement('scrape-form') as ScrapeForm;
+const downloadForm = document.createElement('download-form') as DownloadForm;
 const errorMessage = document.createElement('error-message') as ErrorMessage;
 const successMessage = document.createElement('success-message') as SuccessMessage;
 const loadingBar = document.createElement('loading-bar') as LoadingBar;
-const downloadForm = document.createElement('download-form') as DownloadForm;
 
 interface ScrapeResponse {
   title: string;
@@ -94,7 +94,6 @@ document.addEventListener('DOMContentLoaded', () => {
     scrape(value)
         .then((data) => {
             app.removeChild(loadingBar);
-            app.appendChild(downloadForm);
             downloadForm.url = value;
             downloadForm.original = data.title;
             downloadForm.uploadDate = data.upload_date;
@@ -106,10 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 app.removeChild(downloadForm);
                 app.appendChild(scrapeForm);
             };
-            downloadForm.onSubmit = (url: string, artist: string, title: string, year: number) => {
+            downloadForm.onSubmit = (url: string, artist: string, title: string, year: string) => {
                 app.removeChild(downloadForm);
                 app.appendChild(loadingBar);
-                download(url, artist, title, String(year))
+                download(url, artist, title, year)
                     .then((message) => {
                         app.removeChild(loadingBar);
                         app.appendChild(successMessage);
@@ -123,6 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         app.appendChild(downloadForm);
                     });
             };
+            app.appendChild(downloadForm);
         })
         .catch((error) => {
             app.removeChild(loadingBar);

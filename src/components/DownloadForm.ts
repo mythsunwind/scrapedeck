@@ -8,7 +8,7 @@ export class DownloadForm extends HTMLElement {
   private _defaultYear = 2026;
   private _uploadDate = "";
   private _onCancel?: () => void;
-  private _onSubmit?: (url: string, artist: string, title: string, year: number) => void;
+  private _onSubmit?: (url: string, artist: string, title: string, year: string) => void;
 
   constructor() {
     super();
@@ -90,11 +90,11 @@ export class DownloadForm extends HTMLElement {
     this._onCancel = callback;
   }
 
-  get onSubmit(): ((url: string, artist: string, title: string, year: number) => void) | undefined {
+  get onSubmit(): ((url: string, artist: string, title: string, year: string) => void) | undefined {
     return this._onSubmit;
   }
 
-  set onSubmit(callback: ((url: string, artist: string, title: string, year: number) => void) | undefined) {
+  set onSubmit(callback: ((url: string, artist: string, title: string, year: string) => void) | undefined) {
     this._onSubmit = callback;
   }
 
@@ -144,7 +144,7 @@ export class DownloadForm extends HTMLElement {
         </div>
       </div>
       <fieldset class="row mb-3">
-        <legend class="col-form-label col-2 pt-0">Playlist</legend>
+        <legend class="col-form-label col-2">Playlist</legend>
         <div class="col-auto" id="years">
         </div>
       </fieldset>
@@ -161,26 +161,36 @@ export class DownloadForm extends HTMLElement {
     if (!years.includes(this.defaultYear)) {
       years.push(this.defaultYear);
     }
+    years.sort((x, y) => x - y);
     years.map( (year) => {
       const button = document.createElement('year-button') as YearButton;
       button.year = String(year);
-      if (this.defaultYear === year) {
-        button.checked = true;
-      }
       yearsContainer?.appendChild(button);
+    });
+    years.map((year) => {
+      if (this.defaultYear === year) {
+        const button = document.getElementById(String(year)) as HTMLInputElement;
+        button.click();
+      }
     });
 
     const inputUrl = document.getElementById('url') as HTMLInputElement;
     const inputArtist = document.getElementById('artist') as HTMLInputElement;
     const inputTitle = document.getElementById('title') as HTMLInputElement;
-    //const inputYear = document.getElementById('year') as HTMLInputElement;
     const form = document.querySelector('.needs-validation') as HTMLFormElement;
     form.addEventListener('submit', event => {
       if (!form.checkValidity()) {
           event.preventDefault()
           event.stopPropagation()
       } else {
-        this._onSubmit?.(inputUrl.value, inputArtist.value, inputTitle.value, 2026);
+        let year = String(this.defaultYear)
+        const radios = document.getElementsByName('year');
+        radios.forEach((radio) => {
+          if ((radio as HTMLInputElement).checked) {
+            year = radio.id;
+          }
+        })
+        this._onSubmit?.(inputUrl.value, inputArtist.value, inputTitle.value, year);
       }
 
       form.classList.add('was-validated')
