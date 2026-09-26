@@ -60,7 +60,9 @@ function sanitizeTitle(original: string): string {
     original = original.replace("(Official)", "")
     original = original.replace("(Official Video)", "")
     original = original.replace("(Official Music Video)", "")
-    return original.trim().replace(/[^a-zA-Z ,-]/g, '');
+    original = original.replace("(Official Visualizer)", "")
+    original = original.replace("(Lyrics)", "")
+    return original.trim().replace(/[^a-zA-Z '&,-]/g, '');
 }
 
 function getArtist(original: string): string {
